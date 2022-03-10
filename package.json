@@ -5,7 +5,7 @@
   "scripts": {
     "serve": "NODE_ENV=development nodemon server.js",
     "client": "react-scripts start",
-    "start": "react-scripts build && NODE_ENV=production node server.js"
+    "start": "NODE_ENV=production node server.js"
   },
   "dependencies": {
     "compression": "^1.7.4",
