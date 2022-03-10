@@ -8,10 +8,10 @@ const app = express();
 const server = http.createServer(app);
 
 app.disable('x-powered-by');
-app.use(morgan('short'));
 app.use(compression());
 
 const isProduction = app.get('env') === 'production' || process.env.NODE_ENV === 'production';
+isProduction ? '' : app.use(morgan('short'));
 
 if (isProduction) {
   app.use(express.static(path.join(__dirname, "build")));
@@ -25,7 +25,7 @@ if (isProduction) {
 const io = require('socket.io')(server, {
   cors: {
     origin: isProduction
-      ? "*"
+      ? ["https://instant-sharing.onrender.com"]
       : ["http://localhost:3000"],
   },
   autoConnect: true,
@@ -40,4 +40,10 @@ io.on('connection', socket => {
   signal(socket, io);
 });
 
-server.listen(5000, () => console.log('server is running on port 5000'));
+const PORT = isProduction
+  ? process.env.PORT
+  : 5000;
+
+server.listen(PORT, () => {
+  console.log('server is running on port ' + PORT)
+});

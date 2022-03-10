@@ -1,17 +1,17 @@
 import { useState, useEffect, useRef } from "react"
 import { useSearchParams } from "react-router-dom";
 import { FileUploader } from "react-drag-drop-files";
-import streamSaver from "streamsaver";
+import Spinner from "../components/Spinner";
 import iceServersConfig from "../utils/iceServersConfig";
 import downloadFile from "../utils/downloadFile";
+import streamSaver from "streamsaver";
 
 import './FileShare.css'
-import Spinner from "../components/Spinner";
 
 const fileTypes = ["JPG", "PNG", "GIF", "PDF", "DOCX", "TXT", "JSON"];
 
 const proxy_server = process.env.NODE_ENV === 'production'
-  ? 'https://maxiserv.azurewebsites.net'
+  ? 'https://instant-sharing.onrender.com'
   : 'http://localhost:5000';
 
 const io = window.io;
