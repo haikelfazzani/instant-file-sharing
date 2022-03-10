@@ -1,0 +1,9 @@
+.bg-yellow {background-color: var(--yellow); color: var(--dark);}
+.bg-dark {background-color: var(--dark); color: var(--white);}
+.bg-gray {background-color: var(--gray); color: var(--white);}
+.bg-pistachio {background-color: var(--pistachio); color: var(--dark); }
+
+.light {color: var(--light);}
+.gray {color: var(--gray);}
+.green {color: var(--green);}
+.yellow {color: var(--yellow);}

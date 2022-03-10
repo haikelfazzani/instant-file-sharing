@@ -1,0 +1,8 @@
+log/
+css/index.css
+
+resources
+log
+*.pem
+.cache
+.env

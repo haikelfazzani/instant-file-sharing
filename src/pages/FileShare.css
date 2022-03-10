@@ -1,0 +1,20 @@
+.drop-zone * {color: var(--white);}
+
+.drop-zone span {
+  font-size: 18px;
+}
+
+.drop-zone div {
+  display: flex;
+  flex-direction: column;
+}
+
+.drop-zone>label {
+  min-height: 160px;
+  min-width: 200px;
+}
+
+.drop-zone svg {
+  min-height: 150px;
+  min-width: 150px;
+}

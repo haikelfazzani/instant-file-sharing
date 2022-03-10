@@ -1,0 +1,19 @@
+.display-1 {font-size: 5rem;}
+.display-2 {font-size: 3rem;}
+
+h1 { position: relative; margin-top: 0; font-size: 3.2rem;}
+h4 { margin-top: 0; font-size: 1rem;}
+
+h1:before {
+  background: var(--dark);
+  bottom: -12px;
+  content: "";
+  height: 3px;
+  left: 0;
+  position: absolute;
+  width: 80px;
+}
+
+.text-uppercase {text-transform: uppercase;}
+.text-center {text-align: center;}
+.text-truncate { width: 80%; white-space:nowrap; overflow: hidden; text-overflow:ellipsis; }
