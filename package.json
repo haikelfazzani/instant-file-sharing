@@ -5,6 +5,7 @@
   "scripts": {
     "serve": "NODE_ENV=development nodemon server.js",
     "client": "react-scripts start",
+    "build": "react-scripts build",
     "start": "NODE_ENV=production node server.js"
   },
   "dependencies": {
