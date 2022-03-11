@@ -1,0 +1,29 @@
+.file-drop-area {
+  position: relative;
+  padding: 25px;
+  border: 1px dashed var(--light);
+  text-align: center;
+  transition: 0.2s;
+}
+
+.file-drop-area.is-active {
+  background-color: var(--light);
+}
+
+.btn {
+  border: 1px solid var(--gray);
+}
+
+input[type="file"] {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  cursor: pointer;
+  opacity: 0;
+}
+
+input[type="file"]:focus {
+  outline: none;
+}

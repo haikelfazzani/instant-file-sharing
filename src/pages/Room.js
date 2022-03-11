@@ -1,19 +1,19 @@
 import { useState, useEffect, useRef } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { FileUploader } from "react-drag-drop-files";
+
 import Spinner from "../components/Spinner";
 import iceServersConfig from "../utils/iceServersConfig";
 import downloadFile from "../utils/downloadFile";
 import FileTable from "../components/FileTable";
+import InputFile from "../components/InputFile";
 //import streamSaver from "streamsaver";
 import '../styles/Room.css';
-
-const fileTypes = ["JPG", "PNG", "GIF", "PDF", "DOCX", "TXT", "JSON"];
 
 const proxy_server = process.env.NODE_ENV === 'production'
   ? 'https://instant-sharing.onrender.com'
   : 'http://localhost:5000';
 
+const audio = new Audio();
 const io = window.io;
 const Peer = window.SimplePeer;
 const worker = new window.Worker('/worker.js');
@@ -59,7 +59,7 @@ export default function Room() {
       else {
         setMessage(message)
         socket.current.emit('get-users-room', RoomId);
-        const audio = new Audio('https://www.myinstants.com/media/sounds/google-meet-ask-to-join-sound.mp3')
+        audio.src = 'https://www.myinstants.com/media/sounds/google-meet-ask-to-join-sound.mp3';
         await audio.play();
       }
     });
@@ -128,9 +128,9 @@ export default function Room() {
       socket.current.emit("receiver-signal", { signal, to });
     });
 
-    receiverRef.current.on('data', data => {
+    receiverRef.current.on('data', async data => {
       if (data.toString().includes('done')) {
-        setFileInfos(JSON.parse(data))
+        setFileInfos(JSON.parse(data));
       } else {
         worker.postMessage(data)
       }
@@ -157,9 +157,11 @@ export default function Room() {
     setFileInfos(null);
   }
 
-  const onDowloadFile = () => {
+  const onDowloadFile = async () => {
     worker.postMessage('download')
     worker.addEventListener('message', onWorkerMessage);
+    audio.src = 'https://www.myinstants.com/media/sounds/in_call_notify_d3dba3973359ac82666f4532a7806b51.mp3';
+    await audio.play();
   }
 
   const onSendFile = async () => {
@@ -192,6 +194,10 @@ export default function Room() {
     }
   }
 
+  const onFileChange = e => {
+    setSelectedFile(e.target.files[0]);
+  }
+
   return (<main className="bg-dark position-relative">
 
     <div className="w-100 h-100 d-flex flex-column justify-center align-center py-5">
@@ -199,9 +205,7 @@ export default function Room() {
       {initiator && <div className="w-100 text-center">
         {roomUsers.length > 1
           ? <>
-            <div className="drop-zone mb-3">
-              <FileUploader handleChange={(file) => { setSelectedFile(file); }} name="file" types={fileTypes} />
-            </div>
+            <InputFile onChange={onFileChange} />
 
             <FileTable file={fileInfos || selectedFile} />
 

@@ -23,19 +23,16 @@ export default function Home() {
   }
 
   return <main className="bg-dark">
-    <div>
-      <h1>Create room</h1>
+    <h2>Create room</h2>
 
-      {sharedLink && <div className="w-100">
-        <h4><i className="fa fa-link mr-1"></i>Copy link and shared with your friend</h4>
-        <CopyBox text={sharedLink} onCopy={onCopy} />
+    {sharedLink && <div className="w-100">
+      <h4><i className="fa fa-link mr-1"></i>Copy link and shared with your friend</h4>
+      <CopyBox text={sharedLink} onCopy={onCopy} />
+    </div>}
+
+    {!sharedLink && !initiator
+      && <div className="mb-2">
+        <button className="bg-yellow" type="button" onClick={onCreateRoom}><i className="fa fa-plus mr-1"></i>Create room</button>
       </div>}
-
-      {!sharedLink && !initiator
-        && <div className="mb-2">
-          <button className="bg-yellow" type="button" onClick={onCreateRoom}><i className="fa fa-plus mr-1"></i>Create room</button>
-        </div>}
-    </div>
-
   </main>
 }
