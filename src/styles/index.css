@@ -40,6 +40,8 @@ main {
   padding: 25px 80px;
 }
 
+footer * {font-size: 0.8rem !important;}
+
 .btn, button, input {
    padding: 1.4em 1.2em; 
    border: none; 
@@ -48,7 +50,7 @@ main {
   outline: none;
 }
 
-a, label, button, .btn { font-size: 0.9rem; color: var(--black); text-transform: uppercase; text-decoration: none; }
+a, label, button, .btn { font-size: 1.1rem; color: var(--black); text-transform: uppercase; text-decoration: none; }
 
 .btn,button {  
   display: inline-flex;
@@ -83,9 +85,10 @@ a, label, button, .btn { font-size: 0.9rem; color: var(--black); text-transform:
   background-color: transparent;
   padding: 0;
   margin-left: 15px;
-  color: #fff;
   border: 0;
 }
+
+.fa-cloud-download-alt {font-size: 10rem;}
 
 .drop-zone label {
   border-color: var(--pistachio);

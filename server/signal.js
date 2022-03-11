@@ -1,16 +1,16 @@
 const Users = require('./Users');
 
 let users = {};
+let validRooms = {};
 
 module.exports = function signal(socket, io) {
-
   socket.emit('get-my-id', socket.id);
 
   socket.on("join-room", async ({ RoomId, username, initiator }) => {
-
     const usersInThisRoom = users[RoomId] || [];
+    validRooms[RoomId] = RoomId;
 
-    if (usersInThisRoom.length < 3) {
+    if (usersInThisRoom.length < 2) {
       socket.data.RoomId = RoomId;
       socket.data.username = username;
       socket.data.initiator = initiator;
@@ -19,14 +19,22 @@ module.exports = function signal(socket, io) {
       await socket.join(RoomId);
       Users.add(users, socket.data);
 
-      socket.broadcast.to(RoomId)
-        .emit("new-user-join-room", 'New user join room ' + username);
+      socket.broadcast.to(RoomId).emit("new-user-join-room", {
+        message:username + ' join room ',
+        fullRoom:false
+      });
+    }
+    else {  
+      io.to(socket.id).emit("new-user-join-room", {fullRoom:false});
+      socket.disconnect(true);
+      io.in(socket.id).disconnectSockets(true);
     }
   });
 
   socket.on("get-users-room", async RoomId => {
-    if (users[RoomId] && users[RoomId].length > 0) {
-      io.to(RoomId).emit("room-users", users[RoomId]);
+    const roomUsers = users[RoomId];
+    if (roomUsers && roomUsers.length > 0 && roomUsers.length < 3) {
+      io.to(RoomId).emit("room-users", roomUsers);
     }
   });
 

@@ -7,11 +7,11 @@ const names = [
   'Mario', 'Khabib', 'Pedri', 'Maldini', 'Dybala', 'Simeone', 'Pogba', 'Hakimi',
   'Benzema', 'Cezar', 'Tevez', 'Ambrosini', 'Nesta', 'Stam', 'Lion', 'Tiger', 'Moon',
   'Eros', 'Geographos', 'Hathor', 'Hermes', 'Icarus', 'Pallas', 'Trojan', 'asteroids', 'Vesta',
-  'Mercury', 'Venus', 'Earth', 'Mars',' Jupiter', 'Saturn', 'Uranus', 'Neptune',
+  'Mercury', 'Venus', 'Earth', 'Mars', ' Jupiter', 'Saturn', 'Uranus', 'Neptune',
   'CoRoT-7b', 'Gliese 581', 'HD 209458b', 'HIP 13044b', 'Kepler-186f', 'Kepler-452b',
   'Sleepy', 'Happy', 'Dopey', 'Sneezey', 'Grumpy', 'Bashful', 'Doc'
 ];
 
 export default function makeid() {
-  return names[Math.floor(Math.random() * names.length)] + '-' + (''+Date.now()).slice(-2);
+  return names[Math.floor(Math.random() * names.length)] + '-' + Math.floor(10 + Math.random() * 99);
 }

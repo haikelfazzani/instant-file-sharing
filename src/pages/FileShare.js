@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react"
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { FileUploader } from "react-drag-drop-files";
 import Spinner from "../components/Spinner";
 import iceServersConfig from "../utils/iceServersConfig";
@@ -16,12 +16,29 @@ const proxy_server = process.env.NODE_ENV === 'production'
 
 const io = window.io;
 const Peer = window.SimplePeer;
-const worker = new window.Worker('/worker.js')
+const worker = new window.Worker('/worker.js');
+
+const FileTable = ({ file }) => {
+  if (file) {
+    return <table className="w-100 br7 mb-3">
+      <thead><tr><th>file name</th><th>size</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>{file.name}</td>
+          <td>{parseInt(file.size / 1024, 10)} kb</td>
+        </tr>
+      </tbody>
+    </table>
+  }
+  else return <></>
+}
 
 export default function FileShare() {
 
+  let navigate = useNavigate();
+
   // url params
-  const [searchParams] = useSearchParams()
+  const [searchParams] = useSearchParams();
   const RoomId = searchParams.get("room");
   const initiator = JSON.parse(searchParams.get("initiator"));
   const username = searchParams.get("username");
@@ -49,9 +66,15 @@ export default function FileShare() {
       setUserId(id);
     });
 
-    socket.current.on('new-user-join-room', message => {
-      setMessage(message)
-      socket.current.emit('get-users-room', RoomId);
+    socket.current.on('new-user-join-room', ({ message, fullRoom }) => {
+      if (fullRoom) {
+        socket.current.disconnect();
+        navigate("/");
+      }
+      else {
+        setMessage(message)
+        socket.current.emit('get-users-room', RoomId);
+      }
     });
 
     socket.current.on('room-users', users => {
@@ -82,13 +105,13 @@ export default function FileShare() {
     });
 
     socket.current.on('disconnect', () => {
-      console.log('disconnect');
+      //navigate("/");
     });
 
     return () => {
-      socket.current.close();
       callerRef.current = null;
       receiverRef.current = null;
+      socket.current.close();
       worker.removeEventListener('message', onWorkerMessage);
     }
   }, [RoomId]);
@@ -102,6 +125,11 @@ export default function FileShare() {
     callerRef.current.on("signal", signal => {
       socket.current.emit("signaling", { signal, from: userId, to })
     });
+
+    callerRef.current.on('error', () => {
+      setUser([]);
+      socket.current.disconnect();
+    })
   }
 
   function receiverPeer(to, signal) {
@@ -121,6 +149,11 @@ export default function FileShare() {
       }
     });
 
+    receiverRef.current.on('error', () => {
+      setUser([]);
+      socket.current.disconnect();
+    });
+
     receiverRef.current.signal(signal);
   }
 
@@ -129,12 +162,12 @@ export default function FileShare() {
     // const fileStream = streamSaver.createWriteStream(fileInfos.name);
     // stream.pipeTo(fileStream);    
     downloadFile(event.data, fileInfos.name)
-    setFileInfos(null);
     worker.removeEventListener('message', onWorkerMessage);
 
     socket.current.emit("file-status", {
       RoomId, message: 'Success Download', username
     });
+    setFileInfos(null);
   }
 
   const onDowloadFile = () => {
@@ -154,7 +187,12 @@ export default function FileShare() {
       offset += chunksize;
     }
 
-    peer.write(JSON.stringify({ done: true, name: selectedFile.name.replace(/\s+/g, '-') }));
+    peer.write(JSON.stringify({
+      done: true,
+      name: selectedFile.name.replace(/\s+/g, '-'),
+      size: selectedFile.size
+    }));
+
     setSelectedFile(null);
 
     socket.current.emit("file-status", {
@@ -169,29 +207,46 @@ export default function FileShare() {
 
   return (<main className="bg-dark position-relative">
 
-    <div className="w-100 h-100 d-flex flex-column justify-center align-center">
-      {initiator && roomUsers.length > 1
-        && <div className="drop-zone mb-3">
-          <FileUploader handleChange={(file) => { setSelectedFile(file); }} name="file" types={fileTypes} />
-        </div>}
+    <div className="w-100 h-100 d-flex flex-column justify-center align-center py-5">
 
-      {selectedFile && <button className="w-100 bg-yellow" onClick={onSendFile}>
-        <i className="fa fa-paper-plane mr-1"></i>send file ({selectedFile.name})
-      </button>}
+      {initiator && <div className="w-100 text-center">
+        {roomUsers.length > 1
+          ? <>
+            <div className="drop-zone mb-3">
+              <FileUploader handleChange={(file) => { setSelectedFile(file); }} name="file" types={fileTypes} />
+            </div>
 
-      {!fileInfos && !initiator && <Spinner />}
+            <FileTable file={fileInfos || selectedFile} />
 
-      {fileInfos &&
-        <div>
-          <span><i class="fas fa-cloud-download-alt display-1"></i></span>
-          <button className="w-100 bg-yellow" onClick={onDowloadFile}>
-            <i className="fa fa-download mr-1"></i>download ({fileInfos.name})
-          </button>
-        </div>}
+            {selectedFile && <button className="bg-yellow" onClick={onSendFile}>
+              <i className="fa fa-paper-plane mr-1"></i>send file
+            </button>}
+          </>
+          : <>
+            <Spinner />
+            <h3>Waiting for friend to connect</h3>
+          </>}
+      </div>}
+
+
+      {!initiator && <div className="w-100 text-center">
+        {fileInfos
+          ? <>
+            <span><i className="fas fa-cloud-download-alt"></i></span>
+            <FileTable file={fileInfos || selectedFile} />
+            <button className="bg-yellow" onClick={onDowloadFile}>
+              <i className="fa fa-download mr-1"></i>download
+            </button>
+          </>
+          : <>
+            <Spinner />
+            <h3>Waiting for friend to connect</h3>
+          </>}
+      </div>}
     </div>
 
-    {roomUsers.length > 0 && <div
-      className="w-100 bg-dark p-1"
+    {(roomUsers.length > 0 && userId && username) && <div
+      className="w-100 p-1"
       style={{ position: 'absolute', top: '0', left: '0', padding: '10px 20px' }}
     >
       <small className="light text-uppercase">
@@ -200,13 +255,16 @@ export default function FileShare() {
 
       <div className="w-100 d-flex mt-1">
         {roomUsers.map(u => <div key={u.id}
-          className={"mr-3 " + ((u.id === user.id || u.username === username) ? 'yellow' : 'shake')}>
-          <span><i className={"fa fa-" + ((u.id === user.id || u.username === username) ? 'user mr-1' : 'smile mr-1')}></i></span>
-          <span>{(u.id === user.id || u.username === username) ? `You (${u.username})` : u.username}</span>
+          className={"mr-3 " + ((u.id === userId || u.username === username) ? 'yellow' : 'shake')}>
+          <span><i className={"fa fa-" + ((u.id === userId || u.username === username) ? 'user mr-1' : 'smile mr-1')}></i></span>
+          <span>{(u.id === userId || u.username === username) ? `You (${u.username})` : u.username}</span>
         </div>)}
       </div>
     </div>}
 
-    {message && <div className="snackbar">{message} <button className="bg-yellow" onClick={() => { setMessage(null) }}>X</button></div>}
+    {message && <div className="snackbar bg-pistachio">
+      <span>{message}</span>
+      <button className="bg-yellow" onClick={() => { setMessage(null) }}>X</button>
+    </div>}
   </main>);
 }
