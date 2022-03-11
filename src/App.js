@@ -8,7 +8,7 @@ import PrivateRoute from "./components/PrivateRoute";
 
 export default function App() {
   return <>
-    <main>
+    <main className="justify-between">
       <div></div>
       <div>
         <h1><i className="fa fa-share mr-1"></i>Instant</h1>

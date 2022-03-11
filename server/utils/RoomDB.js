@@ -14,7 +14,6 @@ module.exports = class JsonDb {
         await writeFilePromise(file_path, all_rooms);
       }
       else {
-        console.log('Exists ---> ');
         throw new Error('User already exists')
       }
     }
