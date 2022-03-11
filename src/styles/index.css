@@ -43,10 +43,10 @@ main {
 footer * {font-size: 0.8rem !important;}
 
 .btn, button, input {
-   padding: 1.4em 1.2em; 
-   border: none; 
-   border-radius: 3px; 
-   line-height: 1; 
+  padding: 1.2em; 
+  border: none; 
+  border-radius: 3px; 
+  line-height: 1; 
   outline: none;
 }
 

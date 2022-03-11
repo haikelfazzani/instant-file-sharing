@@ -1,3 +1,4 @@
+const RoomDB = require("./utils/RoomDB");
 const Users = require('./Users');
 
 let users = {};
@@ -7,6 +8,7 @@ module.exports = function signal(socket, io) {
   socket.emit('get-my-id', socket.id);
 
   socket.on("join-room", async ({ RoomId, username, initiator }) => {
+    
     const usersInThisRoom = users[RoomId] || [];
     validRooms[RoomId] = RoomId;
 
@@ -53,11 +55,14 @@ module.exports = function signal(socket, io) {
       .emit("file-status", { message, username });
   });
 
-  socket.on('disconnect', () => {
+  socket.on('disconnect', async () => {
     socket.data.id = socket.id;
+    Users.remove(users, socket.data);
+    const newUsers = await RoomDB.removeOne(socket.data.RoomId, socket.data);
+
     io.to(socket.data.RoomId).emit('leave-room', {
-      message: socket.data.username + 'left room ',
-      users: Users.remove(users, socket.data)
+      message: socket.data.username + ' left room ',
+      users: newUsers
     });
   });
 }

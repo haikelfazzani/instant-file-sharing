@@ -7,6 +7,7 @@ import downloadFile from "../utils/downloadFile";
 import streamSaver from "streamsaver";
 
 import './FileShare.css'
+import axios from "axios";
 
 const fileTypes = ["JPG", "PNG", "GIF", "PDF", "DOCX", "TXT", "JSON"];
 
@@ -42,6 +43,7 @@ export default function FileShare() {
   const RoomId = searchParams.get("room");
   const initiator = JSON.parse(searchParams.get("initiator"));
   const username = searchParams.get("username");
+  const token = searchParams.get("token");
 
   // socket
   const socket = useRef();
@@ -59,59 +61,70 @@ export default function FileShare() {
   const [fileInfos, setFileInfos] = useState(null)
 
   useEffect(() => {
-    socket.current = io.connect(proxy_server, { forceNew: true });
-    socket.current.emit('join-room', { RoomId, username, initiator });
 
-    socket.current.on('get-my-id', id => {
-      setUserId(id);
-    });
+    axios.get(proxy_server + '/token/verify?token=' + token + '&room=' + RoomId + '&username=' + username)
+      .then(result => {
+        console.log(result.data);
 
-    socket.current.on('new-user-join-room', ({ message, fullRoom }) => {
-      if (fullRoom) {
-        socket.current.disconnect();
+        socket.current = io.connect(proxy_server, { forceNew: true });
+        socket.current.emit('join-room', { RoomId, username, initiator });
+
+        socket.current.on('get-my-id', id => {
+          setUserId(id);
+        });
+
+        socket.current.on('new-user-join-room', async ({ message, fullRoom }) => {
+          if (fullRoom) {
+            socket.current.disconnect();
+            navigate("/");
+          }
+          else {
+            setMessage(message)
+            socket.current.emit('get-users-room', RoomId);
+            const audio = new Audio('https://www.myinstants.com/media/sounds/google-meet-ask-to-join-sound.mp3')
+            await audio.play();
+          }
+        });
+
+        socket.current.on('room-users', users => {
+          if (users.length > 1 && initiator) {
+            const userToCallID = users.find(u => !u.initiator).id;
+            callerPeer(userToCallID)
+          }
+          setRoomUsers(users)
+        });
+
+        socket.current.on('caller-signal', ({ signal, from }) => {
+          if (!initiator && from && signal) receiverPeer(from, signal)
+        });
+
+        socket.current.on("on-receiver-signal", signal => {
+          if (signal && callerRef.current) {
+            callerRef.current.signal(signal);
+          }
+        });
+
+        socket.current.on('file-status', ({ message, username }) => {
+          setMessage(message + ' | ' + username)
+        });
+
+        socket.current.on('leave-room', ({ message, users }) => {
+          setRoomUsers(users);
+          setMessage(message)
+        });
+
+        socket.current.on('disconnect', () => {
+          if(roomUsers.length < 2) navigate("/");
+        });
+      })
+      .catch(e => {
         navigate("/");
-      }
-      else {
-        setMessage(message)
-        socket.current.emit('get-users-room', RoomId);
-      }
-    });
-
-    socket.current.on('room-users', users => {
-      if (users.length > 1 && initiator) {
-        const userToCallID = users.find(u => !u.initiator).id;
-        callerPeer(userToCallID)
-      }
-      setRoomUsers(users)
-    });
-
-    socket.current.on('caller-signal', ({ signal, from }) => {
-      if (!initiator && from && signal) receiverPeer(from, signal)
-    });
-
-    socket.current.on("on-receiver-signal", signal => {
-      if (signal && callerRef.current) {
-        callerRef.current.signal(signal);
-      }
-    });
-
-    socket.current.on('file-status', ({ message, username }) => {
-      setMessage(message + ' | ' + username)
-    });
-
-    socket.current.on('leave-room', ({ message, users }) => {
-      setRoomUsers(users);
-      setMessage(message)
-    });
-
-    socket.current.on('disconnect', () => {
-      //navigate("/");
-    });
+      });
 
     return () => {
       callerRef.current = null;
       receiverRef.current = null;
-      socket.current.close();
+      if (socket.current) socket.current.close();
       worker.removeEventListener('message', onWorkerMessage);
     }
   }, [RoomId]);
@@ -228,7 +241,6 @@ export default function FileShare() {
           </>}
       </div>}
 
-
       {!initiator && <div className="w-100 text-center">
         {fileInfos
           ? <>
@@ -240,7 +252,7 @@ export default function FileShare() {
           </>
           : <>
             <Spinner />
-            <h3>Waiting for friend to connect</h3>
+            <h3>Waiting for a connection</h3>
           </>}
       </div>}
     </div>

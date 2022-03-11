@@ -5,6 +5,8 @@ node_modules
 .env
 .cache
 .env.development
+.rooms
+.rooms.json
 
 # testing
 coverage

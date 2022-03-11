@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 import { Routes, Route, useSearchParams, useNavigate, Navigate } from "react-router-dom";
 
 import About from "./pages/About";
@@ -8,6 +9,10 @@ import Footer from "./components/Footer";
 import nanoid from "./utils/nanoid";
 import makeid from "./utils/makeid";
 
+const proxy_server = process.env.NODE_ENV === 'production'
+  ? 'https://instant-sharing.onrender.com'
+  : 'http://localhost:5000';
+
 export default function App() {
 
   const navigate = useNavigate();
@@ -15,11 +20,17 @@ export default function App() {
   const initiator = searchParams.get("initiator");
   const [sharedLink, setSharedLink] = useState(null);
 
-  const onCreateRoom = () => {
+  const onCreateRoom = async () => {
     const room = nanoid();
+    const username = makeid(5);
+    const friendUsername = makeid(5);
     const link = '?room=' + room + '&initiator=true';
-    setSharedLink(window.location.origin + link.replace('true', 'false') + '&username=' + makeid(5))
-    navigate('/' + link + '&username=' + makeid(5));
+
+    const token = await axios.get(proxy_server + '/token/create?room=' + room + '&username=' + username);
+    const tokenFriend = await axios.get(proxy_server + '/token/create?room=' + room + '&username=' + friendUsername);
+
+    setSharedLink(window.location.origin + link.replace('true', 'false') + '&username=' + friendUsername + '&token=' + tokenFriend.data)
+    navigate(link + '&username=' + username + '&token=' + token.data);
   }
 
   return (<>
@@ -33,12 +44,12 @@ export default function App() {
           <p className="gray">transfer files directly from one browser to another without going through an intermediary server by utilizing WebRTC. Files are encrypted in your browser using the password you provide. The files are decrypted in the receiver's browser using the same password.</p>
         </div>
 
-        {sharedLink && <div className="w-100">
+        {sharedLink && initiator && <div className="w-100">
           <h4><i className="fa fa-link mr-1"></i>Copy link and shared with your friend</h4>
           <CopyBox text={sharedLink} />
         </div>}
 
-        {!sharedLink && (!initiator || initiator === 'true')
+        {!sharedLink && !initiator
           && <div className="mb-2">
             <button type="button" onClick={onCreateRoom}><i className="fa fa-plus mr-1"></i>Create room</button>
           </div>}
