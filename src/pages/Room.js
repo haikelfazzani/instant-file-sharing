@@ -4,10 +4,9 @@ import { FileUploader } from "react-drag-drop-files";
 import Spinner from "../components/Spinner";
 import iceServersConfig from "../utils/iceServersConfig";
 import downloadFile from "../utils/downloadFile";
-import streamSaver from "streamsaver";
-
-import './FileShare.css'
-import axios from "axios";
+import FileTable from "../components/FileTable";
+//import streamSaver from "streamsaver";
+import '../styles/Room.css';
 
 const fileTypes = ["JPG", "PNG", "GIF", "PDF", "DOCX", "TXT", "JSON"];
 
@@ -19,22 +18,7 @@ const io = window.io;
 const Peer = window.SimplePeer;
 const worker = new window.Worker('/worker.js');
 
-const FileTable = ({ file }) => {
-  if (file) {
-    return <table className="w-100 br7 mb-3">
-      <thead><tr><th>file name</th><th>size</th></tr></thead>
-      <tbody>
-        <tr>
-          <td>{file.name}</td>
-          <td>{parseInt(file.size / 1024, 10)} kb</td>
-        </tr>
-      </tbody>
-    </table>
-  }
-  else return <></>
-}
-
-export default function FileShare() {
+export default function Room() {
 
   let navigate = useNavigate();
 
@@ -43,7 +27,6 @@ export default function FileShare() {
   const RoomId = searchParams.get("room");
   const initiator = JSON.parse(searchParams.get("initiator"));
   const username = searchParams.get("username");
-  const token = searchParams.get("token");
 
   // socket
   const socket = useRef();
@@ -61,65 +44,56 @@ export default function FileShare() {
   const [fileInfos, setFileInfos] = useState(null)
 
   useEffect(() => {
+    socket.current = io.connect(proxy_server, { forceNew: true });
+    socket.current.emit('join-room', { RoomId, username, initiator });
 
-    axios.get(proxy_server + '/token/verify?token=' + token + '&room=' + RoomId + '&username=' + username)
-      .then(result => {
-        console.log(result.data);
+    socket.current.on('get-my-id', id => {
+      setUserId(id);
+    });
 
-        socket.current = io.connect(proxy_server, { forceNew: true });
-        socket.current.emit('join-room', { RoomId, username, initiator });
-
-        socket.current.on('get-my-id', id => {
-          setUserId(id);
-        });
-
-        socket.current.on('new-user-join-room', async ({ message, fullRoom }) => {
-          if (fullRoom) {
-            socket.current.disconnect();
-            navigate("/");
-          }
-          else {
-            setMessage(message)
-            socket.current.emit('get-users-room', RoomId);
-            const audio = new Audio('https://www.myinstants.com/media/sounds/google-meet-ask-to-join-sound.mp3')
-            await audio.play();
-          }
-        });
-
-        socket.current.on('room-users', users => {
-          if (users.length > 1 && initiator) {
-            const userToCallID = users.find(u => !u.initiator).id;
-            callerPeer(userToCallID)
-          }
-          setRoomUsers(users)
-        });
-
-        socket.current.on('caller-signal', ({ signal, from }) => {
-          if (!initiator && from && signal) receiverPeer(from, signal)
-        });
-
-        socket.current.on("on-receiver-signal", signal => {
-          if (signal && callerRef.current) {
-            callerRef.current.signal(signal);
-          }
-        });
-
-        socket.current.on('file-status', ({ message, username }) => {
-          setMessage(message + ' | ' + username)
-        });
-
-        socket.current.on('leave-room', ({ message, users }) => {
-          setRoomUsers(users);
-          setMessage(message)
-        });
-
-        socket.current.on('disconnect', () => {
-          if(roomUsers.length < 2) navigate("/");
-        });
-      })
-      .catch(e => {
+    socket.current.on('new-user-join-room', async ({ message, fullRoom }) => {
+      if (fullRoom) {
+        socket.current.disconnect();
         navigate("/");
-      });
+      }
+      else {
+        setMessage(message)
+        socket.current.emit('get-users-room', RoomId);
+        const audio = new Audio('https://www.myinstants.com/media/sounds/google-meet-ask-to-join-sound.mp3')
+        await audio.play();
+      }
+    });
+
+    socket.current.on('room-users', users => {
+      if (users.length > 1 && initiator) {
+        const userToCallID = users.find(u => !u.initiator).id;
+        callerPeer(userToCallID)
+      }
+      setRoomUsers(users)
+    });
+
+    socket.current.on('caller-signal', ({ signal, from }) => {
+      if (!initiator && from && signal) receiverPeer(from, signal)
+    });
+
+    socket.current.on("on-receiver-signal", signal => {
+      if (signal && callerRef.current) {
+        callerRef.current.signal(signal);
+      }
+    });
+
+    socket.current.on('file-status', ({ message, username }) => {
+      setMessage(message + ' | ' + username)
+    });
+
+    socket.current.on('leave-room', ({ message, users }) => {
+      setRoomUsers(users);
+      setMessage(message)
+    });
+
+    socket.current.on('disconnect', () => {
+      if (roomUsers.length < 2) navigate("/");
+    });
 
     return () => {
       callerRef.current = null;
@@ -127,7 +101,7 @@ export default function FileShare() {
       if (socket.current) socket.current.close();
       worker.removeEventListener('message', onWorkerMessage);
     }
-  }, [RoomId]);
+  }, []);
 
   function callerPeer(to) {
     if (callerRef.current) return;

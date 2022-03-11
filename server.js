@@ -24,13 +24,14 @@ app.get('/token/create', async (req, res) => {
     const { username, room } = req.query;
     const id = nanoid();
     const user = await RoomDB.getOne(room, username);
+    const date = Date.now();
 
     if (user) {
       res.status(401).json({ success: false })
     }
     else {
-      const token = jwt.sign({ username, room }, id, { expiresIn: 60 * 60 });
-      await RoomDB.save(room, { username, id });
+      const token = jwt.sign({ username, room }, id, { expiresIn: 5 * 60 });
+      await RoomDB.save(room, { username, id, date });
       res.send(token);
     }
   } catch (error) {
@@ -45,6 +46,7 @@ app.get('/token/verify', async (req, res) => {
     const success = jwt.verify(token, user.id);
     res.status(200).json({ success });
   } catch (error) {
+    await RoomDB.removeOne(room, { username });
     res.status(401).json({ success: false })
   }
 })

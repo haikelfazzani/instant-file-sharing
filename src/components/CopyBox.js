@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-export default function CopyBox({ text }) {
+export default function CopyBox({ text, onCopy }) {
 
   const [textCopy, setTextCopy] = useState('Copy')
 
@@ -12,12 +12,12 @@ export default function CopyBox({ text }) {
     document.execCommand('copy');
     document.body.removeChild(input);
     setTextCopy('Copied')
-    setTimeout(() => { setTextCopy('Copy') }, 2000);
+    onCopy();
   }
 
-  return <div className="w-100 d-flex justify-between align-center box">
+  return <div className="w-100 bg-yellow d-flex justify-between align-center box">
     <p onClick={onCopyLink} className="m-0 text-truncate">{text}</p>
-    <button onClick={onCopyLink} className="bg-pistachio">
+    <button onClick={onCopyLink} className="bg-dark">
       <i className='fa fa-copy mr-1'></i>{textCopy}
     </button>
   </div>

@@ -50,7 +50,7 @@ footer * {font-size: 0.8rem !important;}
   outline: none;
 }
 
-a, label, button, .btn { font-size: 1.1rem; color: var(--black); text-transform: uppercase; text-decoration: none; }
+a, label, button, .btn { font-size: 1rem; color: var(--black); text-transform: uppercase; text-decoration: none; }
 
 .btn,button {  
   display: inline-flex;
