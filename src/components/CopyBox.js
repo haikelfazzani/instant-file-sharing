@@ -15,8 +15,8 @@ export default function CopyBox({ text, onCopy }) {
     onCopy();
   }
 
-  return <div className="w-100 bg-yellow d-flex justify-between align-center box">
-    <p onClick={onCopyLink} className="m-0 text-truncate">{text}</p>
+  return <div className="w-100 bg-white d-flex justify-between align-center box">
+    <p className="m-0 text-truncate">{text}</p>
     <button onClick={onCopyLink} className="bg-dark">
       <i className='fa fa-copy mr-1'></i>{textCopy}
     </button>

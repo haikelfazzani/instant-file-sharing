@@ -1,7 +1,6 @@
 .file-drop-area {
   position: relative;
   padding: 25px;
-  border: 1px dashed var(--light);
   text-align: center;
   transition: 0.2s;
 }

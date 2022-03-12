@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Navigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import Spinner from "./Spinner";
 import TokenService from "../services/TokenService";
 
@@ -19,9 +19,7 @@ const PrivateRoute = (props) => {
         .then(result => {
           if (result) setIsValidUser(true)
         })
-        .catch(e => {
-          setIsValidUser(false)
-        });
+        .catch(e => { setIsValidUser(false) });
     }
 
     return () => {

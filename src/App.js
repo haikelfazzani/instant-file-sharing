@@ -12,12 +12,10 @@ export default function App() {
       <div></div>
       <div>
         <h1><i className="fa fa-share mr-1"></i>Instant</h1>
-
-        <div className="mb-2">
-          <h4 className="mb-0"><i className="fa fa-cog mr-1"></i>How it works</h4>
-          <p className="gray">transfer files directly from one browser to another without going through an intermediary server by utilizing WebRTC. Files are encrypted in your browser using the password you provide. The files are decrypted in the receiver's browser using the same password.</p>
-        </div>
-
+        <p className="gray">Instant is a secure P2P platform to send and share your photos and memories, your favorite videos and music, as well as your personal and professional documents using WeBRTC datachannels (No server in the middle).</p>
+        <h3 className="mb-0"><i className="fa fa-check mr-1"></i>Send large files</h3>
+        <h3 className="m-0"><i className="fa fa-check mr-1"></i>No need to install any software</h3>
+        <h3 className="m-0"><i className="fa fa-check mr-1"></i>It's 100% free, no registration required</h3>
       </div>
 
       <Footer />
@@ -25,8 +23,7 @@ export default function App() {
 
     <Routes>
       <Route index path="/" element={<Home />} />
-      {/* <PrivateRoute path="/room" component={Room} /> */}
-      <Route path="/room" element={<PrivateRoute><Room /></PrivateRoute>} />
+      <Route path="/sharing" element={<PrivateRoute><Room /></PrivateRoute>} />
       <Route path="/about" element={<About />} />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>

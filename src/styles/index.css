@@ -57,8 +57,8 @@ a, label, button, .btn { font-size: 1rem; color: var(--black); text-transform: u
   justify-content: center;
   align-items: center;   
   cursor: pointer;
-  background:var(--dark);
-  color: var(--white);
+  background:var(--white);
+  color: var(--dark);
   font-weight: 500;
   font-family: Google Sans,Segoe UI,system-ui,-apple-system,sans-serif;
   transition: opacity 0.25s;  
@@ -93,10 +93,10 @@ td,th {border: 1px dashed var(--light); padding: 10px; border-radius: 7px;}
 
 .fa-cloud-download-alt {font-size: 10rem;}
 
-.box{
+.box, summary, details h5{
   background-color: var(--dark);
   color: var(--white);
-  padding: 10px;
+  padding: 6px 10px;
   border-radius: 7px;
   box-shadow: 0 2px 4px rgb(0 0 0 / 10%), 0 8px 16px rgb(0 0 0 / 10%);
 }

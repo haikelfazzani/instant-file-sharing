@@ -182,6 +182,7 @@ export default function Room() {
       size: selectedFile.size
     }));
 
+    setMessage('File sent successfully!')
     setSelectedFile(null);
 
     socket.current.emit("file-status", {
@@ -200,18 +201,14 @@ export default function Room() {
 
   return (<main className="bg-dark position-relative">
 
-    <div className="w-100 h-100 d-flex flex-column justify-center align-center py-5">
+    <div className="w-100 h-100 d-flex flex-column justify-center align-center">
 
       {initiator && <div className="w-100 text-center">
         {roomUsers.length > 1
           ? <>
             <InputFile onChange={onFileChange} />
-
             <FileTable file={fileInfos || selectedFile} />
-
-            {selectedFile && <button className="bg-yellow" onClick={onSendFile}>
-              <i className="fa fa-paper-plane mr-1"></i>send file
-            </button>}
+            {selectedFile && <button onClick={onSendFile}><i className="fa fa-paper-plane mr-1"></i>send file</button>}
           </>
           : <>
             <Spinner />
@@ -222,15 +219,13 @@ export default function Room() {
       {!initiator && <div className="w-100 text-center">
         {fileInfos
           ? <>
-            <span><i className="fas fa-cloud-download-alt"></i></span>
+            <span><i className="fas fa-cloud-download-alt gray"></i></span>
             <FileTable file={fileInfos || selectedFile} />
-            <button className="bg-yellow" onClick={onDowloadFile}>
-              <i className="fa fa-download mr-1"></i>download
-            </button>
+            <button onClick={onDowloadFile}><i className="fa fa-download mr-1"></i>download</button>
           </>
           : <>
             <Spinner />
-            <h3>Waiting for a connection</h3>
+            <h3>Waiting for a file</h3>
           </>}
       </div>}
     </div>

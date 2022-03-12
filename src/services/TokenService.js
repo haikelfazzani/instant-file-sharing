@@ -13,7 +13,7 @@ export default class TokenService {
       const room = nanoid();
       const username = makeid(5);
       const friendUsername = makeid(5);
-      const link = '/room?room=' + room + '&initiator=true';
+      const link = '/sharing?room=' + room + '&initiator=true';
 
       const token = await axios.get(SERVER_URL + '/token/create?room=' + room + '&username=' + username);
       const tokenFriend = await axios.get(SERVER_URL + '/token/create?room=' + room + '&username=' + friendUsername);
