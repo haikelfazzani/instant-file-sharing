@@ -13,9 +13,9 @@ export default function App() {
       <div>
         <h1><i className="fa fa-share mr-1"></i>Instant</h1>
         <p className="gray">Instant is a secure P2P platform to send and share your photos and memories, your favorite videos and music, as well as your personal and professional documents using WeBRTC datachannels (No server in the middle).</p>
-        <h3 className="mb-0"><i className="fa fa-check mr-1"></i>Send large files</h3>
-        <h3 className="m-0"><i className="fa fa-check mr-1"></i>No need to install any software</h3>
-        <h3 className="m-0"><i className="fa fa-check mr-1"></i>It's 100% free, no registration required</h3>
+        <h3 className="mb-0 mb-1"><i className="fa fa-check mr-1"></i>Send large files</h3>
+        <h3 className="m-0 mb-1"><i className="fa fa-check mr-1"></i>No need to install any software</h3>
+        <h3 className="m-0 mb-1"><i className="fa fa-check mr-1"></i>It's 100% free, no registration required</h3>
       </div>
 
       <Footer />

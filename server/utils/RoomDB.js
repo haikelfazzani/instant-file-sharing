@@ -44,9 +44,32 @@ module.exports = class JsonDb {
         all_rooms[room] = newUsers;
       }
       await writeFilePromise(file_path, all_rooms);
+
+      await this.clean();
       return newUsers;
     } catch (error) {
+      console.log(error);
       return null;
     }
   }
-}
+
+  static async clean(room) {
+    try {
+      // remove room
+      if (room) { delete all_rooms[room]; return; }
+
+      // check expiration room : 30 minutes
+      const all_rooms = await readFilePromise(file_path);
+
+      for (const [key, value] of Object.entries(all_rooms)) {
+        if ((Date.now() > value[0].date + (30 * 60000)) || value.length < 2) {
+          delete all_rooms[key];
+        }
+      }
+
+      await writeFilePromise(file_path, all_rooms);
+    } catch (error) {
+
+    }
+  }
+} 

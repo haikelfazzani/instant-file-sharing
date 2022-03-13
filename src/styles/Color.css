@@ -3,11 +3,13 @@
 .bg-gray {background-color: var(--gray); color: var(--white);}
 .bg-pistachio {background-color: var(--pistachio); color: var(--dark); }
 .bg-white {background-color: var(--white); color: var(--dark); }
+.bg-sky {background-color: var(--sky); }
 
 .light {color: var(--light);}
 .gray {color: var(--gray);}
 .green {color: var(--green);}
 .yellow {color: var(--yellow);}
+.sky {color: var(--sky);}
 
 .bordred {
   border: 1px dashed var(--light);

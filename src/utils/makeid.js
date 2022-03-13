@@ -8,7 +8,7 @@ const names = [
   'Benzema', 'Cezar', 'Tevez', 'Ambrosini', 'Nesta', 'Stam', 'Lion', 'Tiger', 'Moon',
   'Eros', 'Geographos', 'Hathor', 'Hermes', 'Icarus', 'Pallas', 'Trojan', 'asteroids', 'Vesta',
   'Mercury', 'Venus', 'Earth', 'Mars', ' Jupiter', 'Saturn', 'Uranus', 'Neptune',
-  'CoRoT-7b', 'Gliese 581', 'HD 209458b', 'HIP 13044b', 'Kepler-186f', 'Kepler-452b',
+  'CoRoT-7b', 'Gliese 581', 'HD 209458b', 'HIP 13044b', 'Kepler186f', 'Kepler452b',
   'Sleepy', 'Happy', 'Dopey', 'Sneezey', 'Grumpy', 'Bashful', 'Doc'
 ];
 

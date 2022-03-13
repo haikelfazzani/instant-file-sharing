@@ -9,11 +9,12 @@
   --yellow:#f7e43a;
   --green: #26ff00;
   --pistachio:#85ff46;
+  --sky: #00a9e2;
 }
 
 body {
   margin: 0;
-  background-color: var(--pistachio);
+  background-color: var(--sky);
   font-size: 1rem;
   font-family: 'Roboto', sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
@@ -44,13 +45,20 @@ footer * {font-size: 0.8rem !important;}
 
 .btn, button, input {
   padding: 1.2em; 
+  font-size: 1rem;
   border: none; 
   border-radius: 3px; 
   line-height: 1; 
   outline: none;
 }
 
-a, label, button, .btn { font-size: 1rem; color: var(--black); text-transform: uppercase; text-decoration: none; }
+input {
+  font-size: 0.96rem;
+}
+
+a, label, button, .btn { 
+  color: var(--black); text-transform: uppercase; text-decoration: none; 
+}
 
 .btn,button {  
   display: inline-flex;
@@ -68,8 +76,6 @@ a, label, button, .btn { font-size: 1rem; color: var(--black); text-transform: u
 
 .snackbar {
   min-width: 250px;  
-  background-color: #424242;
-  color: #fff;
   text-align: center;
   border-radius: 7px;
   padding: 16px;

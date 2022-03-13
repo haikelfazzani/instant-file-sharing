@@ -10,10 +10,12 @@ export default function Home() {
   const initiator = searchParams.get("initiator");
 
   const [sharedLink, setSharedLink] = useState(null);
-  const [roomURL, setRoomURL] = useState()
+  const [roomURL, setRoomURL] = useState();
+
+  const [username, setUsername] = useState('')
 
   const onCreateRoom = async () => {
-    const { url, shared } = await TokenService.create();
+    const { url, shared } = await TokenService.create(username);
     setSharedLink(shared);
     setRoomURL(url)
   }
@@ -25,7 +27,7 @@ export default function Home() {
   return <main className="bg-dark text-center">
 
     <div className="w-100 mb-2">
-      <img style={{ width: '300px', margin: 'auto' }}
+      <img style={{ width: '270px', margin: 'auto' }}
         src="https://cdn.tresorit.com/webv10/dist/gatsby/static/a47b2a0b61bd4551e7d9129c7cc05081/5865e/secure-file-sharing-use-case-2.png"
         alt="file sharing"
       />
@@ -40,6 +42,16 @@ export default function Home() {
       && <div className="w-100 text-uppercase">
         <h3 className="m-0">Create a secure room</h3>
         <h3>and start sharing files with yours friends</h3>
+        <div className="w-100 mb-2">
+          <input
+            type="text"
+            onChange={(e) => { setUsername(e.target.value) }}
+            value={username}
+            pattern="[A-Za-z0-9]{10}"
+            name="username"
+            placeholder="username (optional)"
+          />
+        </div>
         <button type="button" onClick={onCreateRoom}><i className="fa fa-plus mr-1"></i>Create room</button>
       </div>}
   </main>

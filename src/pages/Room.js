@@ -200,9 +200,7 @@ export default function Room() {
   }
 
   return (<main className="bg-dark position-relative">
-
     <div className="w-100 h-100 d-flex flex-column justify-center align-center">
-
       {initiator && <div className="w-100 text-center">
         {roomUsers.length > 1
           ? <>
@@ -234,20 +232,24 @@ export default function Room() {
       className="w-100 p-1"
       style={{ position: 'absolute', top: '0', left: '0', padding: '10px 20px' }}
     >
-      <small className="light text-uppercase">
-        <i className="fa fa-circle green mr-1"></i>{roomUsers.length} Connected Users
-      </small>
+      <div className="w-100 d-flex justify-between light text-uppercase">
+        <small className="mr-2">
+          <i className="fa fa-circle green mr-1"></i>{roomUsers.length} Connected Users
+        </small>
+
+        <small><i className="fa fa-clock mr-1"></i>{new Date().toLocaleString()}</small>
+      </div>
 
       <div className="w-100 d-flex mt-1">
         {roomUsers.map(u => <div key={u.id}
-          className={"mr-3 " + ((u.id === userId || u.username === username) ? 'yellow' : 'shake')}>
+          className={"mr-3 " + ((u.id === userId || u.username === username) ? 'sky' : 'shake')}>
           <span><i className={"fa fa-" + ((u.id === userId || u.username === username) ? 'user mr-1' : 'smile mr-1')}></i></span>
           <span>{(u.id === userId || u.username === username) ? `You (${u.username})` : u.username}</span>
         </div>)}
       </div>
     </div>}
 
-    {message && <div className="snackbar bg-pistachio">
+    {message && <div className="snackbar bg-sky">
       <span>{message}</span>
       <button className="bg-yellow" onClick={() => { setMessage(null) }}>X</button>
     </div>}

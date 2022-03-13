@@ -8,10 +8,11 @@ const SERVER_URL = process.env.NODE_ENV === 'production'
 
 export default class TokenService {
 
-  static async create() {
+  static async create(username = '') {
     try {
       const room = nanoid();
-      const username = makeid(5);
+      username = username.length > 1 ? username : makeid(5);
+
       const friendUsername = makeid(5);
       const link = '/sharing?room=' + room + '&initiator=true';
 
@@ -23,7 +24,7 @@ export default class TokenService {
         shared: window.location.origin + link.replace('true', 'false') + '&username=' + friendUsername + '&token=' + tokenFriend.data
       }
     } catch (error) {
-      return null;
+      window.location.href = '/'
     }
   }
 
@@ -31,7 +32,7 @@ export default class TokenService {
     try {
       return await axios.get(SERVER_URL + '/token/verify?token=' + token + '&room=' + RoomId + '&username=' + username)
     } catch (error) {
-      return null;
+      window.location.href = '/'
     }
   }
 }

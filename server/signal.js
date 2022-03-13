@@ -1,16 +1,14 @@
 const RoomDB = require("./utils/RoomDB");
-const Users = require('./Users');
+const RoomMem = require('./utils/RoomMem');
 
-let users = {};
-let validRooms = {};
+let rooms = {};
 
 module.exports = function signal(socket, io) {
   socket.emit('get-my-id', socket.id);
 
   socket.on("join-room", async ({ RoomId, username, initiator }) => {
-    
-    const usersInThisRoom = users[RoomId] || [];
-    validRooms[RoomId] = RoomId;
+
+    const usersInThisRoom = rooms[RoomId] || [];
 
     if (usersInThisRoom.length < 2) {
       socket.data.RoomId = RoomId;
@@ -19,24 +17,25 @@ module.exports = function signal(socket, io) {
       socket.data.id = socket.id;
 
       await socket.join(RoomId);
-      Users.add(users, socket.data);
+      RoomMem.add(rooms, socket.data);
 
       socket.broadcast.to(RoomId).emit("new-user-join-room", {
-        message:username + ' join room ',
-        fullRoom:false
+        message: username + ' join room ',
+        fullRoom: false
       });
     }
-    else {  
-      io.to(socket.id).emit("new-user-join-room", {fullRoom:false});
+    else {
+      io.to(socket.id).emit("new-user-join-room", { fullRoom: false });
       socket.disconnect(true);
       io.in(socket.id).disconnectSockets(true);
+      return;
     }
   });
 
   socket.on("get-users-room", async RoomId => {
-    const roomUsers = users[RoomId];
-    if (roomUsers && roomUsers.length > 0 && roomUsers.length < 3) {
-      io.to(RoomId).emit("room-users", roomUsers);
+    const usersInThisRoom = rooms[RoomId] || [];
+    if (usersInThisRoom.length > 0 && usersInThisRoom.length < 3) {
+      io.to(RoomId).emit("room-users", usersInThisRoom);
     }
   });
 
@@ -56,13 +55,12 @@ module.exports = function signal(socket, io) {
   });
 
   socket.on('disconnect', async () => {
-    socket.data.id = socket.id;
-    Users.remove(users, socket.data);
-    const newUsers = await RoomDB.removeOne(socket.data.RoomId, socket.data);
-
+    // if one user left room , the room will be deleted
     io.to(socket.data.RoomId).emit('leave-room', {
       message: socket.data.username + ' left room ',
-      users: newUsers
+      users: RoomMem.deleteRoom(rooms, socket.data.RoomId)
     });
+
+    await RoomDB.clean(socket.data.RoomId);
   });
 }
